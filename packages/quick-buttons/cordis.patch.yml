@@ -1,0 +1,5 @@
+- insert:
+    - id: quick-buttons
+      name: dsh-quick-buttons
+      config:
+        clickAction: insert

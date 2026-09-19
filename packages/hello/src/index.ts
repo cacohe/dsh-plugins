@@ -2,14 +2,14 @@ import type { Context } from '@deepseek-ai/cordis'
 import Schema from '@deepseek-ai/schemastery'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 
-/** Cordis plugin name. Keep in sync with package.json and cordis.patch.yml. */
-export const name = 'dsh-plugin'
+/** Cordis 插件名。须与 package.json、cordis.patch.yml 的 `name` 保持一致。 */
+export const name = 'dsh-hello-plugin'
 
-/** Wait for the Harness tool registry before registering `greet`. */
+/** 等待 Harness 工具注册表就绪后再注册 `greet`。 */
 export const inject = ['tools']
 
 export interface Config {
-  /** Prefix used by the greet tool, e.g. "Hello, Ada!". */
+  /** 问候语前缀，例如 "Hello, Ada!"。 */
   greeting: string
 }
 
@@ -18,16 +18,16 @@ export const Config: Schema<Config> = Schema.object({
 })
 
 export function apply(ctx: Context, config: Config): void {
-  console.log(`[dsh-plugin] loaded (greeting="${config.greeting}")`)
+  console.log(`[dsh-hello-plugin] loaded (greeting="${config.greeting}")`)
 
   ctx.tools.register(defineTool({
     name: 'greet',
-    description: 'Greet someone by name.',
+    description: '按名字向某人打招呼。',
     parameters: {
       name: {
         type: 'string',
         required: true,
-        description: 'The name to greet',
+        description: '要问候的名字',
       },
     },
     output: {

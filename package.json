@@ -1,36 +1,18 @@
 {
-  "name": "dsh-plugin",
-  "version": "0.1.0",
-  "description": "A simple DeepSeek Harness example plugin that registers a greet tool.",
+  "name": "dsh-plugins",
+  "private": true,
+  "description": "DeepSeek Harness 插件 monorepo。",
   "license": "MIT",
-  "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "files": [
-    "lib",
-    "cordis.patch.yml",
-    "README.md",
-    "LICENSE"
-  ],
-  "engines": {
-    "node": "^22.19 || >=24",
-    "dsh": ">=0.1.0-rc.6"
-  },
-  "dsh": {
-    "bundle": {
-      "patch": "./cordis.patch.yml"
-    }
-  },
   "scripts": {
-    "build": "tsdown",
-    "typecheck": "tsc --noEmit",
-    "check": "pnpm run typecheck && pnpm run build",
-    "prepare": "pnpm run build"
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "check": "pnpm -r run check"
   },
-  "keywords": [
-    "dsh-plugin",
-    "deepseek-harness"
-  ],
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": "^22.19 || >=24"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:cacohe/dsh-plugin.git"
@@ -39,25 +21,8 @@
     "url": "https://github.com/cacohe/dsh-plugin/issues"
   },
   "homepage": "https://github.com/cacohe/dsh-plugin",
-  "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-tools": "^0.1.0-rc.6"
-  },
-  "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.1"
-  },
   "devDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
-    "tsdown": "^0.22.14",
-    "typescript": "^6.0.3"
-  },
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "default": "./lib/index.js"
-    },
-    "./cordis.patch.yml": "./cordis.patch.yml",
-    "./package.json": "./package.json"
+    "typescript": "^6.0.3",
+    "tsdown": "^0.22.14"
   }
 }

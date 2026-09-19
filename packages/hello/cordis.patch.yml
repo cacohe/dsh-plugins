@@ -1,5 +1,5 @@
 - insert:
-    - id: dsh-plugin
-      name: dsh-plugin
+    - id: hello
+      name: dsh-hello-plugin
       config:
         greeting: Hello

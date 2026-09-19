@@ -1,20 +1,20 @@
 import Schema from "@deepseek-ai/schemastery";
 import { defineTool } from "@deepseek-ai/dsh-tools";
 //#region src/index.ts
-/** Cordis plugin name. Keep in sync with package.json and cordis.patch.yml. */
-const name = "dsh-plugin";
-/** Wait for the Harness tool registry before registering `greet`. */
+/** Cordis 插件名。须与 package.json、cordis.patch.yml 的 `name` 保持一致。 */
+const name = "dsh-hello-plugin";
+/** 等待 Harness 工具注册表就绪后再注册 `greet`。 */
 const inject = ["tools"];
 const Config = Schema.object({ greeting: Schema.string().default("Hello") });
 function apply(ctx, config) {
-	console.log(`[dsh-plugin] loaded (greeting="${config.greeting}")`);
+	console.log(`[dsh-hello-plugin] loaded (greeting="${config.greeting}")`);
 	ctx.tools.register(defineTool({
 		name: "greet",
-		description: "Greet someone by name.",
+		description: "按名字向某人打招呼。",
 		parameters: { name: {
 			type: "string",
 			required: true,
-			description: "The name to greet"
+			description: "要问候的名字"
 		} },
 		output: {
 			schema: { type: "string" },
