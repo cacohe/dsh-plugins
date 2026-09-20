@@ -1,21 +1,16 @@
 import type { Context } from '@deepseek-ai/cordis'
 import Schema from '@deepseek-ai/schemastery'
+import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
+import { QUICK_BUTTONS_SETTINGS_NAMESPACE } from './shared.js'
+import type { Config as ConfigShape } from './shared.js'
+
+export { QUICK_BUTTONS_SETTINGS_NAMESPACE }
+export type { Config as QuickButtonsConfig } from './shared.js'
 
 /** Cordis 插件名。须与 package.json、cordis.patch.yml 的 `name` 保持一致。 */
 export const name = 'dsh-quick-buttons'
 
-export interface Config {
-  /**
-   * 预设按钮的默认点击行为。
-   * - `insert`：写入输入框草稿（发送前可再编辑）
-   * - `send`：立即作为用户消息入队发送
-   *
-   * Web 端仍可按次覆盖：普通点击用此默认值；Alt+点击在插入/发送间切换。
-   */
-  clickAction: 'insert' | 'send'
-}
-
-export const Config: Schema<Config> = Schema.object({
+export const Config: Schema<ConfigShape> = Schema.object({
   clickAction: Schema.union([
     Schema.const('insert'),
     Schema.const('send'),
@@ -23,9 +18,14 @@ export const Config: Schema<Config> = Schema.object({
 })
 
 /**
- * 宿主半区刻意保持精简：功能在浏览器半区（`./client`）。
- * Config 供 patch 覆盖与后续扩展使用。
+ * 宿主半区：把 patch/Config 写入 settings，供浏览器半区读取。
+ * UI 逻辑在 `./client`。
  */
-export function apply(_ctx: Context, config: Config): void {
+export function apply(ctx: Context, config: ConfigShape): void {
+  const ns = settingsNamespace(QUICK_BUTTONS_SETTINGS_NAMESPACE)
+  installSettingsSection(ctx, ns, Config, { clickAction: config.clickAction }, {
+    setSource: () => {},
+    onChange: () => {},
+  })
   console.log(`[dsh-quick-buttons] loaded (clickAction="${config.clickAction}")`)
 }

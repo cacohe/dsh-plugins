@@ -5,10 +5,11 @@
 ## 功能
 
 - 默认按钮：`继续`、`说人话`、`总结`、`审查`
-- 点击主按钮：默认**插入**输入框（可用 Alt+点击 改为直接发送）
+- 点击主按钮：按 settings 中的 `clickAction`（默认**插入**）；可用 Alt+点击单次切换
 - 右侧纸飞机：始终**直接发送**
 - `+` 新增按钮；悬停 `×` 删除；`重置` 恢复默认
-- 列表保存在浏览器 `localStorage`（键：`dsh-quick-buttons:v1`）
+- 按钮列表保存在浏览器 `localStorage`（键：`dsh-quick-buttons:v1`）
+- `clickAction` 经官方 settings 文档从宿主 Config / patch 同步到 Web
 
 ## 安装
 
@@ -30,11 +31,7 @@ dsh plugin --profile web remove dsh-quick-buttons
 
 ## 配置
 
-默认点击为「插入输入框」。发送请用按钮右侧的纸飞机，或 Alt+点击主按钮切换行为。
-
-按钮列表保存在浏览器 localStorage；点「重置」可恢复内置默认项。
-
-主机侧 `cordis.patch.yml` 可写 `clickAction`（目前主要用于启动日志；Web 交互以上述方式为准）：
+在 profile 的 `cordis.patch.yml` 覆盖默认点击行为（会写入 settings 的 composition base，Web 端生效）：
 
 ```yaml
 - override:
@@ -42,6 +39,8 @@ dsh plugin --profile web remove dsh-quick-buttons
       config:
         clickAction: send
 ```
+
+发送也可用按钮右侧纸飞机，或 Alt+点击主按钮切换。按钮文案列表仍在 localStorage；点「重置」可恢复内置默认项。
 
 ## 开发
 

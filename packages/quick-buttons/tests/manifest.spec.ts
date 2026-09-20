@@ -22,6 +22,7 @@ describe('bundle 清单', () => {
     expect(pkg.dsh?.bundle?.patch).toBe('./cordis.patch.yml')
     expect(pkg.dsh?.client?.platform).toBe('web')
     expect(pkg.dsh?.client?.inject).toContain('@deepseek-ai/dsh-client-ui-conversation')
+    expect(pkg.dsh?.client?.inject).toContain('@deepseek-ai/dsh-client-ui-settings')
     expect(pkg.exports?.['./client']).toBeDefined()
     expect(patch).toMatch(/id:\s*quick-buttons/)
     expect(patch).toContain(`name: ${name}`)

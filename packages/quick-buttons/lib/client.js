@@ -206,6 +206,13 @@ window.__ModuleLoader__.load({
 		}
 		//#endregion
 		//#region src/client/QuickButtonsDock.tsx
+		function resolveClickAction(snap) {
+			const fromValue = snap.value?.clickAction;
+			if (fromValue === "insert" || fromValue === "send") return fromValue;
+			const base = snap.base;
+			if (base?.clickAction === "insert" || base?.clickAction === "send") return base.clickAction;
+			return "insert";
+		}
 		const SEND_ICON = /* @__PURE__ */ (0, react_jsx_runtime.jsx)("svg", {
 			width: "12",
 			height: "12",
@@ -220,10 +227,11 @@ window.__ModuleLoader__.load({
 		});
 		/**
 		* 输入框上方整行胶囊按钮（`conversation.input.dock`）。
-		* 点击按配置插入或发送；纸飞机始终发送；Alt+点击单次切换插入/发送。
+		* 点击按 settings 中的 clickAction 插入或发送；纸飞机始终发送；Alt+点击单次切换。
 		*/
 		function QuickButtonsDock(props) {
-			const { input, inputActions, insertText, sendText, clickAction } = props;
+			const { input, inputActions, insertText, sendText, settingsScope } = props;
+			const [settingsSnap, setSettingsSnap] = (0, react.useState)(() => settingsScope.getSnapshot());
 			const [buttons, setButtons] = (0, react.useState)(() => loadButtons());
 			const [adding, setAdding] = (0, react.useState)(false);
 			const [label, setLabel] = (0, react.useState)("");
@@ -233,6 +241,8 @@ window.__ModuleLoader__.load({
 			(0, react.useEffect)(() => {
 				ensureStyles();
 			}, []);
+			(0, react.useEffect)(() => settingsScope.subscribe(() => setSettingsSnap(settingsScope.getSnapshot())), [settingsScope]);
+			const clickAction = resolveClickAction(settingsSnap);
 			const locked = input.phase !== "plain";
 			const disabled = locked || busy;
 			const persist = (next) => {
@@ -395,18 +405,28 @@ window.__ModuleLoader__.load({
 			});
 		}
 		//#endregion
+		//#region src/shared.ts
+		/** 宿主与浏览器半区共用的配置形状（勿在此文件 import 宿主专用包）。 */
+		/**
+		* 设置命名空间字符串。宿主用 `settingsNamespace(...)` 注册，
+		* 浏览器用 `settingsScope.bind({ namespace })` 读取。
+		*/
+		const QUICK_BUTTONS_SETTINGS_NAMESPACE = "quick-buttons";
+		//#endregion
 		//#region src/client/index.tsx
 		/** 本插件依赖的客户端服务。 */
 		const inject = [
 			"slots",
 			"conversation",
-			"sessions"
+			"sessions",
+			"settingsScope"
 		];
 		/**
 		* 在输入框上方注册快捷按钮行。
 		* 失败策略：apply 内绝不向外抛错（避免拖垮 Web UI）。
 		*/
 		function apply(ctx) {
+			const scope = ctx.settingsScope.bind({ namespace: QUICK_BUTTONS_SETTINGS_NAMESPACE });
 			const insertText = (sessionId, text, mode = "replace") => {
 				try {
 					const shell = ctx.conversation.input.shell(sessionId);
@@ -443,7 +463,7 @@ window.__ModuleLoader__.load({
 						id: "quick-buttons",
 						order: 120,
 						inject: (sessionId) => ({
-							clickAction: "insert",
+							settingsScope: scope,
 							insertText: (text, mode) => {
 								insertText(sessionId, text, mode ?? "replace");
 							},

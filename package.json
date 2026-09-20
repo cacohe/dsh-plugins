@@ -7,7 +7,8 @@
     "build": "pnpm -r run build",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
-    "check": "pnpm -r run check"
+    "smoke": "node scripts/smoke.mjs",
+    "check": "pnpm -r run check && pnpm run smoke"
   },
   "packageManager": "pnpm@10.32.1",
   "engines": {
@@ -15,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:cacohe/dsh-plugin.git"
+    "url": "git+https://github.com/cacohe/dsh-plugins.git"
   },
   "bugs": {
-    "url": "https://github.com/cacohe/dsh-plugin/issues"
+    "url": "https://github.com/cacohe/dsh-plugins/issues"
   },
-  "homepage": "https://github.com/cacohe/dsh-plugin",
+  "homepage": "https://github.com/cacohe/dsh-plugins",
   "devDependencies": {
     "typescript": "^6.0.3",
     "tsdown": "^0.22.14"

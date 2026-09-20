@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactElement, type MouseEvent } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { SettingsScope, SettingsScopeSnapshot } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import {
   DEFAULT_BUTTONS,
@@ -10,14 +11,23 @@ import {
   type QuickButton,
 } from './buttons.js'
 import { ensureStyles } from './styles.js'
+import type { Config } from '../shared.js'
 
 export type QuickButtonsDockProps = PropsRuntime<'conversation.input.dock'> & {
   /** 将预设文本写入当前会话草稿。 */
   insertText: (text: string, mode?: 'replace' | 'append') => void
   /** 将预设文本作为用户消息入队（直接发送）。 */
   sendText: (text: string) => Promise<boolean>
-  /** 宿主/patch 配置的默认点击行为：插入或发送。 */
-  clickAction: 'insert' | 'send'
+  /** 宿主 settings 命名空间（含 patch 同步来的 clickAction）。 */
+  settingsScope: SettingsScope<Config>
+}
+
+function resolveClickAction(snap: SettingsScopeSnapshot<Config>): 'insert' | 'send' {
+  const fromValue = snap.value?.clickAction
+  if (fromValue === 'insert' || fromValue === 'send') return fromValue
+  const base = snap.base as Partial<Config> | undefined
+  if (base?.clickAction === 'insert' || base?.clickAction === 'send') return base.clickAction
+  return 'insert'
 }
 
 const SEND_ICON = (
@@ -28,10 +38,11 @@ const SEND_ICON = (
 
 /**
  * 输入框上方整行胶囊按钮（`conversation.input.dock`）。
- * 点击按配置插入或发送；纸飞机始终发送；Alt+点击单次切换插入/发送。
+ * 点击按 settings 中的 clickAction 插入或发送；纸飞机始终发送；Alt+点击单次切换。
  */
 export function QuickButtonsDock(props: QuickButtonsDockProps): ReactElement {
-  const { input, inputActions, insertText, sendText, clickAction } = props
+  const { input, inputActions, insertText, sendText, settingsScope } = props
+  const [settingsSnap, setSettingsSnap] = useState(() => settingsScope.getSnapshot())
   const [buttons, setButtons] = useState<QuickButton[]>(() => loadButtons())
   const [adding, setAdding] = useState(false)
   const [label, setLabel] = useState('')
@@ -42,6 +53,10 @@ export function QuickButtonsDock(props: QuickButtonsDockProps): ReactElement {
   useEffect(() => {
     ensureStyles()
   }, [])
+
+  useEffect(() => settingsScope.subscribe(() => setSettingsSnap(settingsScope.getSnapshot())), [settingsScope])
+
+  const clickAction = resolveClickAction(settingsSnap)
 
   const locked = input.phase !== 'plain'
   const disabled = locked || busy

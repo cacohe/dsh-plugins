@@ -5,6 +5,7 @@ node_modules/
 coverage/
 .turbo/
 dist/
+*.tgz
 .env
 .env.*
 !.env.example

@@ -33,13 +33,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:cacohe/dsh-plugin.git",
+    "url": "git+https://github.com/cacohe/dsh-plugins.git",
     "directory": "packages/hello"
   },
   "bugs": {
-    "url": "https://github.com/cacohe/dsh-plugin/issues"
+    "url": "https://github.com/cacohe/dsh-plugins/issues"
   },
-  "homepage": "https://github.com/cacohe/dsh-plugin/tree/main/packages/hello",
+  "homepage": "https://github.com/cacohe/dsh-plugins/tree/main/packages/hello",
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/dsh-tools": "^0.1.0-rc.6"

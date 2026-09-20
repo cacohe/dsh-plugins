@@ -76,6 +76,31 @@ dsh plugin --profile hello remove dsh-hello-plugin
 dsh plugin --profile web remove dsh-quick-buttons
 ```
 
+### 从 GitHub / monorepo 安装
+
+根目录 `package.json` 是 **private workspace**，不能 `dsh plugin add github:cacohe/dsh-plugins` 整仓安装。可选方式：
+
+1. **克隆后本地路径（推荐开发）**
+
+```sh
+git clone https://github.com/cacohe/dsh-plugins.git
+cd dsh-plugins
+pnpm install && pnpm run build
+dsh plugin --profile web add ./packages/hello
+dsh plugin --profile web add ./packages/quick-buttons
+```
+
+2. **pnpm Git 子目录协议**（装单个包；需允许 `prepare` 构建）
+
+```sh
+dsh plugin --profile web add "github:cacohe/dsh-plugins#path:packages/hello"
+dsh plugin --profile web add "github:cacohe/dsh-plugins#path:packages/quick-buttons"
+```
+
+首次 Git 安装若被 pnpm 拒绝执行 `prepare`，按 dsh 提示在 profile 的 `pnpm-workspace.yaml` 里 `allowBuilds` 放行对应包名后重试。建议钉 commit：`github:cacohe/dsh-plugins#<sha>&path:packages/hello`（具体语法以当前 pnpm 为准）。
+
+3. **发 npm / `pnpm pack` 的 tarball** 后再 `dsh plugin add <包名或 .tgz>`，可避免向用户索要 build 权限。
+
 ## 4. 开发与新增插件
 
 需要 Node `^22.19 || >=24` 和 pnpm。
@@ -85,7 +110,8 @@ dsh plugin --profile web remove dsh-quick-buttons
 ```sh
 pnpm install
 pnpm run test    # 各包 Vitest 单测
-pnpm run check   # typecheck + test + build
+pnpm run smoke   # 打包产物安装 + hello 真实调用冒烟
+pnpm run check   # typecheck + test + build + smoke
 ```
 
 测试覆盖（对齐社区插件实践）：
@@ -93,7 +119,8 @@ pnpm run check   # typecheck + test + build
 - **导出形状**：命名导出、`inject`、无 `default`（Loader 安全）
 - **hello**：真实 Cordis + `ToolRuntime` 注册 / 调用 / 参数校验 / dispose 回滚
 - **manifest**：`package.json` 包名与 `cordis.patch.yml` / Cordis `name` 一致
-- **quick-buttons**：Config 默认值、按钮 localStorage 读写与脏数据回退
+- **quick-buttons**：Config / settings 命名空间、按钮 localStorage 读写与脏数据回退
+- **smoke**：`pnpm pack` 后在干净目录安装，校验清单与 `greet` 执行
 
 ### 新增插件
 
